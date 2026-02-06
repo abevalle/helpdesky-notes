@@ -22,6 +22,18 @@
             --amber: #ffb000;
             --cyan: #00ffff;
             --border: #2d2d30;
+            --surface: #1a1a1c;
+            --hover: #1e1e21;
+            --text-bright: #eee;
+            --text-secondary: #ccc;
+            --text-muted: #666;
+            --text-dim: #444;
+            --placeholder: #333;
+            --input-bg: #000;
+            --danger: #ff4444;
+            --ghost: #2a5a30;
+            --focus-glow: rgba(0, 255, 65, 0.2);
+            --ai-bg: rgba(0, 255, 255, 0.03);
             --font: 'Fira Code', 'Courier New', monospace;
         }
 
@@ -36,8 +48,8 @@
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: #2d2d30; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #444; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
 
         /* --- Sidebar --- */
         #sidebar {
@@ -52,21 +64,21 @@
         }
         #session-list { flex: 1; overflow-y: auto; list-style: none; padding: 0; margin: 0; }
         .session-item {
-            padding: 15px; padding-right: 36px; border-bottom: 1px solid #1a1a1c; cursor: pointer;
+            padding: 15px; padding-right: 36px; border-bottom: 1px solid var(--surface); cursor: pointer;
             transition: 0.2s; border-left: 3px solid transparent; position: relative;
         }
-        .session-item:hover { background: #1e1e21; }
-        .session-item.active { background: #1e1e21; border-left: 3px solid var(--text); }
-        .session-title { display: block; font-size: 0.9rem; color: #eee; margin-bottom: 4px; }
-        .session-meta { font-size: 0.7rem; color: #666; }
+        .session-item:hover { background: var(--hover); }
+        .session-item.active { background: var(--hover); border-left: 3px solid var(--text); }
+        .session-title { display: block; font-size: 0.9rem; color: var(--text-bright); margin-bottom: 4px; }
+        .session-meta { font-size: 0.7rem; color: var(--text-muted); }
         .session-delete {
             position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
             background: transparent; border: 1px solid transparent;
-            color: #444; font-size: 1.1rem; padding: 2px 6px;
+            color: var(--text-dim); font-size: 1.1rem; padding: 2px 6px;
             cursor: pointer; opacity: 0; transition: 0.2s; line-height: 1;
         }
         .session-item:hover .session-delete { opacity: 1; }
-        .session-delete:hover { color: #ff4444; border-color: #ff4444; }
+        .session-delete:hover { color: var(--danger); border-color: var(--danger); }
 
         /* --- Main --- */
         main { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--bg); }
@@ -74,14 +86,14 @@
         #log-display { flex: 1; overflow-y: auto; padding: 25px; }
 
         #status-bar {
-            height: 30px; background: #000; font-size: 0.75rem;
+            height: 30px; background: var(--input-bg); font-size: 0.75rem;
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 20px; color: var(--amber); border-top: 1px solid var(--border);
         }
-        #status-hints { color: #444; }
+        #status-hints { color: var(--text-dim); }
 
         .toolbar {
-            padding: 12px 20px; background: #121214;
+            padding: 12px 20px; background: var(--sidebar-bg);
             display: flex; gap: 12px; align-items: center;
             border-bottom: 1px solid var(--border);
         }
@@ -94,13 +106,13 @@
             font-family: var(--font); font-size: 0.95rem; outline: none;
             flex: 1; padding: 0; line-height: 1.6;
         }
-        .log-field input::placeholder { color: #333; }
+        .log-field input::placeholder { color: var(--placeholder); }
 
-        .input-wrapper { padding: 20px; background: #0a0a0b; width: 100%; }
+        .input-wrapper { padding: 20px; background: var(--bg); width: 100%; }
         .input-ghost-container { position: relative; }
 
         textarea {
-            width: 100%; height: 90px; background: #121214;
+            width: 100%; height: 90px; background: var(--sidebar-bg);
             border: 1px solid var(--border); color: var(--text);
             font-family: var(--font); padding: 15px; outline: none;
             resize: none; transition: border-color 0.3s, box-shadow 0.3s; font-size: 1rem;
@@ -108,7 +120,7 @@
             position: relative; z-index: 1;
             caret-color: var(--text);
         }
-        textarea:focus { border-color: var(--text); box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); }
+        textarea:focus { border-color: var(--text); box-shadow: 0 0 10px var(--focus-glow); }
 
         .ghost-overlay {
             position: absolute; inset: 0;
@@ -118,10 +130,10 @@
             overflow: hidden; pointer-events: none; z-index: 2;
         }
         .ghost-mirror { visibility: hidden; }
-        .ghost-suggestion { color: #2a5a30; }
+        .ghost-suggestion { color: var(--ghost); }
 
         button {
-            background: #1a1a1c; border: 1px solid var(--border); color: #ccc;
+            background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary);
             padding: 6px 14px; cursor: pointer; font-family: var(--font);
             font-size: 0.75rem; transition: 0.2s;
         }
@@ -130,9 +142,9 @@
 
         /* --- Logs --- */
         .log-entry { margin-bottom: 12px; line-height: 1.6; font-size: 0.95rem; }
-        .ts { color: #555; margin-right: 12px; font-weight: bold; }
+        .ts { color: var(--text-muted); margin-right: 12px; font-weight: bold; }
         .ai-entry {
-            background: rgba(0, 255, 255, 0.03); border-left: 3px solid var(--cyan);
+            background: var(--ai-bg); border-left: 3px solid var(--cyan);
             padding: 15px; margin: 15px 0; border-radius: 0 4px 4px 0;
         }
         .log-img { max-width: 100%; border: 1px solid var(--border); margin: 10px 0; border-radius: 4px; }
@@ -153,7 +165,7 @@
             letter-spacing: 2px; font-size: 1.1rem;
         }
         .modal-subtitle {
-            color: #666; margin: 0 0 30px 0; font-size: 0.85rem;
+            color: var(--text-muted); margin: 0 0 30px 0; font-size: 0.85rem;
         }
         .modal-section { margin-bottom: 20px; }
         .modal-section label {
@@ -162,16 +174,16 @@
         }
         .modal-section select,
         .modal-section input[type="text"] {
-            width: 100%; background: #000; border: 1px solid var(--border);
+            width: 100%; background: var(--input-bg); border: 1px solid var(--border);
             color: var(--cyan); padding: 10px 12px; font-family: var(--font);
             font-size: 0.85rem; outline: none;
         }
         .modal-section select:focus,
         .modal-section input[type="text"]:focus { border-color: var(--cyan); }
-        .modal-section select option { background: #000; color: var(--cyan); }
-        .modal-hint { display: block; color: #444; font-size: 0.7rem; margin-top: 6px; }
+        .modal-section select option { background: var(--input-bg); color: var(--cyan); }
+        .modal-hint { display: block; color: var(--text-dim); font-size: 0.7rem; margin-top: 6px; }
         .modal-divider {
-            text-align: center; color: #444; font-size: 0.75rem;
+            text-align: center; color: var(--text-dim); font-size: 0.75rem;
             margin: 20px 0; position: relative;
         }
         .modal-divider::before, .modal-divider::after {
@@ -185,31 +197,41 @@
             font-size: 0.9rem; letter-spacing: 1px;
         }
         .webgpu-warning {
-            color: #ff4444; font-size: 0.75rem;
+            color: var(--danger); font-size: 0.75rem;
             margin-top: 12px; display: none;
         }
 
         /* --- Confirm Modal --- */
-        .confirm-body { color: #ccc; font-size: 0.85rem; margin: 15px 0 20px; line-height: 1.6; }
+        .confirm-body { color: var(--text-secondary); font-size: 0.85rem; margin: 15px 0 20px; line-height: 1.6; }
         .confirm-actions { display: flex; gap: 10px; }
         .confirm-actions button { flex: 1; padding: 10px; font-size: 0.8rem; }
-        .btn-danger { border-color: #ff4444; color: #ff4444; }
-        .btn-danger:hover { background: #ff4444; color: #000; border-color: #ff4444; }
+        .btn-danger { border-color: var(--danger); color: var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: var(--input-bg); border-color: var(--danger); }
         .confirm-toggle {
             display: flex; align-items: center; gap: 8px;
-            margin-top: 15px; font-size: 0.75rem; color: #666; cursor: pointer;
+            margin-top: 15px; font-size: 0.75rem; color: var(--text-muted); cursor: pointer;
         }
         .confirm-toggle input { accent-color: var(--amber); cursor: pointer; }
 
         /* --- Toast --- */
         .toast {
             position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%);
-            background: var(--amber); color: #000; padding: 8px 20px;
+            background: var(--amber); color: var(--input-bg); padding: 8px 20px;
             font-family: var(--font); font-size: 0.8rem; font-weight: bold;
             border-radius: 4px; opacity: 0; transition: opacity 0.3s;
             pointer-events: none; z-index: 200;
         }
         .toast.show { opacity: 1; }
+
+        /* --- Timer --- */
+        .toolbar-spacer { flex: 1; }
+        .timer-display {
+            color: var(--cyan); font-size: 1rem; font-weight: bold;
+            letter-spacing: 2px; font-variant-numeric: tabular-nums;
+        }
+        .timer-btn, .timer-btn-reset {
+            font-size: 0.7rem; padding: 4px 10px;
+        }
     </style>
 </head>
 <body>
@@ -220,6 +242,19 @@
         <h2 id="setup-title">HELPDESKY.NET — SETUP</h2>
         <p class="modal-subtitle">Fast notes for fast support. Choose your AI model.</p>
 
+        <div class="modal-divider">APPEARANCE</div>
+        <div class="modal-section">
+            <label>THEME</label>
+            <select id="theme-select">
+                <option value="matrix">Matrix — Green on black</option>
+                <option value="amber">Amber Terminal — Warm CRT</option>
+                <option value="cyberpunk">Cyberpunk — Neon magenta</option>
+                <option value="solarized">Solarized Dark — Classic</option>
+                <option value="light">Light — Easy on the eyes</option>
+            </select>
+        </div>
+
+        <div class="modal-divider">AI MODEL</div>
         <div class="modal-section">
             <label>SELECT AI MODEL (RECOMMENDED)</label>
             <select id="model-select">
@@ -242,6 +277,16 @@
         <div id="webgpu-warning" class="webgpu-warning">
             WebGPU not detected. AI features require Chrome 113+, Edge 113+, or another WebGPU-capable browser.
             You can still use Helpdesky for note-taking without AI.
+        </div>
+
+        <div class="modal-divider">TIME TRACKING</div>
+        <div class="modal-section">
+            <label>TIMER MODE</label>
+            <select id="timer-mode-select">
+                <option value="auto" selected>Auto — start on first keystroke</option>
+                <option value="manual">Manual — start/pause with button</option>
+                <option value="disabled">Disabled — no timer</option>
+            </select>
         </div>
 
         <button id="setup-start-btn" class="btn-primary">GET STARTED</button>
@@ -285,7 +330,11 @@
         <button id="clear-btn" class="btn-danger">CLEAR SESSION</button>
         <button id="summary-btn">AI SUMMARY</button>
         <button id="copy-text-btn">COPY RAW</button>
-        <button id="settings-btn">AI SETTINGS</button>
+        <button id="settings-btn">SETTINGS</button>
+        <span class="toolbar-spacer"></span>
+        <span id="timer-display" class="timer-display">00:00:00</span>
+        <button id="timer-toggle" class="timer-btn" style="display:none">START</button>
+        <button id="timer-reset" class="timer-btn-reset" style="display:none">RESET</button>
     </div>
 
     <div id="log-display">
@@ -350,6 +399,76 @@
         async setPref(key, value) { return this.put('preferences', { key, value }); }
     };
 
+    // ─── Themes ──────────────────────────────────────────────────
+    const THEMES = {
+        matrix: {
+            '--bg': '#0a0a0b', '--sidebar-bg': '#121214', '--text': '#00ff41',
+            '--amber': '#ffb000', '--cyan': '#00ffff', '--border': '#2d2d30',
+            '--surface': '#1a1a1c', '--hover': '#1e1e21', '--text-bright': '#eee',
+            '--text-secondary': '#ccc', '--text-muted': '#666', '--text-dim': '#444',
+            '--placeholder': '#333', '--input-bg': '#000', '--danger': '#ff4444',
+            '--ghost': '#2a5a30', '--focus-glow': 'rgba(0, 255, 65, 0.2)',
+            '--ai-bg': 'rgba(0, 255, 255, 0.03)'
+        },
+        amber: {
+            '--bg': '#0c0a00', '--sidebar-bg': '#141200', '--text': '#ffb000',
+            '--amber': '#ff8c00', '--cyan': '#ffd866', '--border': '#3a3000',
+            '--surface': '#1a1600', '--hover': '#221c00', '--text-bright': '#ffe0a0',
+            '--text-secondary': '#cca050', '--text-muted': '#886830', '--text-dim': '#554020',
+            '--placeholder': '#3a2800', '--input-bg': '#080600', '--danger': '#ff4444',
+            '--ghost': '#5a4a20', '--focus-glow': 'rgba(255, 176, 0, 0.2)',
+            '--ai-bg': 'rgba(255, 216, 102, 0.03)'
+        },
+        cyberpunk: {
+            '--bg': '#0a0010', '--sidebar-bg': '#120018', '--text': '#ff2d95',
+            '--amber': '#00fff2', '--cyan': '#b967ff', '--border': '#2d1040',
+            '--surface': '#1a0028', '--hover': '#220030', '--text-bright': '#f0d0ff',
+            '--text-secondary': '#c090dd', '--text-muted': '#7a50a0', '--text-dim': '#4a2868',
+            '--placeholder': '#2a1040', '--input-bg': '#050008', '--danger': '#ff4444',
+            '--ghost': '#5a2050', '--focus-glow': 'rgba(255, 45, 149, 0.2)',
+            '--ai-bg': 'rgba(185, 103, 255, 0.05)'
+        },
+        solarized: {
+            '--bg': '#002b36', '--sidebar-bg': '#073642', '--text': '#839496',
+            '--amber': '#b58900', '--cyan': '#2aa198', '--border': '#094050',
+            '--surface': '#073642', '--hover': '#0a4a58', '--text-bright': '#eee8d5',
+            '--text-secondary': '#93a1a1', '--text-muted': '#657b83', '--text-dim': '#586e75',
+            '--placeholder': '#2a4a50', '--input-bg': '#001e26', '--danger': '#dc322f',
+            '--ghost': '#2a5048', '--focus-glow': 'rgba(131, 148, 150, 0.2)',
+            '--ai-bg': 'rgba(42, 161, 152, 0.05)'
+        },
+        light: {
+            '--bg': '#f5f5f0', '--sidebar-bg': '#e8e8e0', '--text': '#2050a0',
+            '--amber': '#d06000', '--cyan': '#0070a0', '--border': '#c8c8c0',
+            '--surface': '#ddddd5', '--hover': '#d0d0c8', '--text-bright': '#1a1a18',
+            '--text-secondary': '#444440', '--text-muted': '#808078', '--text-dim': '#a0a098',
+            '--placeholder': '#c0c0b8', '--input-bg': '#ffffff', '--danger': '#d02020',
+            '--ghost': '#a0b0d0', '--focus-glow': 'rgba(32, 80, 160, 0.15)',
+            '--ai-bg': 'rgba(0, 112, 160, 0.05)'
+        }
+    };
+
+    let currentTheme = 'matrix';
+
+    function applyTheme(name, save = true) {
+        const theme = THEMES[name];
+        if (!theme) return;
+        currentTheme = name;
+        const root = document.documentElement;
+        for (const [prop, val] of Object.entries(theme)) {
+            root.style.setProperty(prop, val);
+        }
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.content = theme['--bg'];
+        const textColor = encodeURIComponent(theme['--text']);
+        const bgColor = encodeURIComponent(theme['--bg']);
+        const icon = document.querySelector('link[rel="icon"]');
+        if (icon) {
+            icon.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='${textColor}' rx='6'/%3E%3Ctext x='6' y='24' font-size='22' font-family='monospace' font-weight='bold' fill='${bgColor}'%3EH%3C/text%3E%3C/svg%3E`;
+        }
+        if (save) db.setPref('theme', name);
+    }
+
     // ─── Utilities ─────────────────────────────────────────────────
     function debounce(fn, ms) {
         let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
@@ -399,6 +518,11 @@
     const callerNameInput = document.getElementById('caller-name');
     const callbackNumInput = document.getElementById('callback-number');
     const ghostOverlay = document.getElementById('ghost-overlay');
+    const timerDisplay = document.getElementById('timer-display');
+    const timerToggleBtn = document.getElementById('timer-toggle');
+    const timerResetBtn = document.getElementById('timer-reset');
+    const timerModeSelect = document.getElementById('timer-mode-select');
+    const themeSelect = document.getElementById('theme-select');
 
     // ─── Rendering (XSS-safe) ──────────────────────────────────────
     function renderEntry(entry) {
@@ -504,6 +628,7 @@
             mainInput.focus();
             return;
         }
+        pauseTimer();
         await flushSave();
 
         const session = {
@@ -513,7 +638,9 @@
             callbackNumber: '',
             createdAt: Date.now(),
             updatedAt: Date.now(),
-            entries: []
+            entries: [],
+            elapsedMs: 0,
+            timerStartedAt: null
         };
         sessions.unshift(session);
         currentSession = session;
@@ -524,11 +651,13 @@
         callbackNumInput.value = '';
         renderLogDisplay();
         renderSidebar();
+        syncTimerUI();
         mainInput.focus();
     }
 
     async function switchToSession(id) {
         if (currentSession?.id === id) return;
+        pauseTimer();
         await flushSave();
 
         const session = sessions.find(s => s.id === id);
@@ -540,6 +669,7 @@
         callbackNumInput.value = session.callbackNumber || '';
         renderLogDisplay();
         renderSidebar();
+        syncTimerUI();
         mainInput.focus();
     }
 
@@ -557,6 +687,7 @@
             renderLogDisplay();
         }
         renderSidebar();
+        syncTimerUI();
     }
 
     function addEntry(content, type = 'text') {
@@ -575,10 +706,12 @@
 
     function getRawText() {
         if (!currentSession) return '';
+        const elapsed = getSessionElapsed();
         const header = [
             `Ticket: ${currentSession.ticket}`,
             currentSession.callerName ? `Caller: ${currentSession.callerName}` : '',
-            currentSession.callbackNumber ? `Callback: ${currentSession.callbackNumber}` : ''
+            currentSession.callbackNumber ? `Callback: ${currentSession.callbackNumber}` : '',
+            timerMode !== 'disabled' ? `Time: ${formatTime(elapsed)}` : ''
         ].filter(Boolean).join('\n');
         const logs = currentSession.entries
             .filter(e => e.type !== 'image')
@@ -586,6 +719,102 @@
             .join('\n');
         return header + '\n\n' + logs;
     }
+
+    // ─── Timer ──────────────────────────────────────────────────────
+    let timerInterval = null;
+    let timerMode = 'auto';
+
+    function formatTime(ms) {
+        const totalSec = Math.floor(ms / 1000);
+        const h = Math.floor(totalSec / 3600);
+        const m = Math.floor((totalSec % 3600) / 60);
+        const s = totalSec % 60;
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function getSessionElapsed() {
+        if (!currentSession) return 0;
+        const base = currentSession.elapsedMs || 0;
+        if (currentSession.timerStartedAt) {
+            return base + (Date.now() - currentSession.timerStartedAt);
+        }
+        return base;
+    }
+
+    function startTimer() {
+        if (!currentSession || currentSession.timerStartedAt) return;
+        currentSession.timerStartedAt = Date.now();
+        debouncedSave();
+        if (!timerInterval) {
+            timerInterval = setInterval(updateTimerDisplay, 1000);
+        }
+        if (timerMode === 'manual') {
+            timerToggleBtn.textContent = 'PAUSE';
+        }
+    }
+
+    function pauseTimer() {
+        if (!currentSession || !currentSession.timerStartedAt) return;
+        currentSession.elapsedMs = (currentSession.elapsedMs || 0) + (Date.now() - currentSession.timerStartedAt);
+        currentSession.timerStartedAt = null;
+        debouncedSave();
+        if (timerMode === 'manual') {
+            timerToggleBtn.textContent = 'START';
+        }
+    }
+
+    function resetTimer() {
+        if (!currentSession) return;
+        currentSession.elapsedMs = 0;
+        currentSession.timerStartedAt = null;
+        updateTimerDisplay();
+        debouncedSave();
+        if (timerMode === 'manual') {
+            timerToggleBtn.textContent = 'START';
+        }
+    }
+
+    function updateTimerDisplay() {
+        if (timerMode === 'disabled') return;
+        timerDisplay.textContent = formatTime(getSessionElapsed());
+    }
+
+    function syncTimerUI() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+
+        if (timerMode === 'disabled') {
+            timerDisplay.style.display = 'none';
+            timerToggleBtn.style.display = 'none';
+            timerResetBtn.style.display = 'none';
+            return;
+        }
+
+        timerDisplay.style.display = '';
+        timerToggleBtn.style.display = timerMode === 'manual' ? '' : 'none';
+        timerResetBtn.style.display = timerMode === 'manual' ? '' : 'none';
+
+        if (timerMode === 'manual') {
+            timerToggleBtn.textContent = currentSession?.timerStartedAt ? 'PAUSE' : 'START';
+        }
+
+        updateTimerDisplay();
+
+        if (currentSession?.timerStartedAt) {
+            timerInterval = setInterval(updateTimerDisplay, 1000);
+        }
+    }
+
+    timerToggleBtn.onclick = () => {
+        if (!currentSession) return;
+        if (currentSession.timerStartedAt) {
+            pauseTimer();
+        } else {
+            startTimer();
+        }
+    };
+
+    timerResetBtn.onclick = () => resetTimer();
 
     // ─── AI Management ─────────────────────────────────────────────
     const MODEL_FALLBACK = [
@@ -714,8 +943,8 @@
     function showSetupModal(isSettings = false) {
         const title = document.getElementById('setup-title');
         const btn = document.getElementById('setup-start-btn');
-        title.textContent = isSettings ? 'AI MODEL SETTINGS' : 'HELPDESKY.NET — SETUP';
-        btn.textContent = isSettings ? 'SAVE & RELOAD AI' : 'GET STARTED';
+        title.textContent = isSettings ? 'SETTINGS' : 'HELPDESKY.NET — SETUP';
+        btn.textContent = isSettings ? 'SAVE' : 'GET STARTED';
         setupModal.dataset.mode = isSettings ? 'settings' : 'setup';
 
         if (!navigator.gpu) {
@@ -723,6 +952,7 @@
         }
 
         if (isSettings) {
+            themeSelect.value = currentTheme;
             db.getPref('modelId').then(id => {
                 if (!id) return;
                 const opt = modelSelect.querySelector(`option[value="${CSS.escape(id)}"]`);
@@ -734,10 +964,13 @@
                     customModelGroup.style.display = 'block';
                 }
             });
+            timerModeSelect.value = timerMode;
         } else {
+            themeSelect.value = 'matrix';
             modelSelect.value = 'Llama-3.2-1B-Instruct-q4f16_1-MLC';
             customModelGroup.style.display = 'none';
             customModelInput.value = '';
+            timerModeSelect.value = 'auto';
         }
 
         setupModal.style.display = 'flex';
@@ -745,6 +978,10 @@
 
     modelSelect.onchange = () => {
         customModelGroup.style.display = modelSelect.value === 'custom' ? 'block' : 'none';
+    };
+
+    themeSelect.onchange = () => {
+        applyTheme(themeSelect.value, false);
     };
 
     document.getElementById('setup-start-btn').onclick = async () => {
@@ -758,16 +995,27 @@
             }
         }
 
+        applyTheme(themeSelect.value);
+
+        const prevModelId = await db.getPref('modelId');
         await db.setPref('modelId', modelId);
+
+        timerMode = timerModeSelect.value;
+        await db.setPref('timerMode', timerMode);
+
         setupModal.style.display = 'none';
 
         if (setupModal.dataset.mode === 'setup') {
             await loadAllSessions();
+        } else {
+            syncTimerUI();
         }
 
-        aiReady = false;
-        engine = null;
-        initAI();
+        if (modelId !== prevModelId) {
+            aiReady = false;
+            engine = null;
+            initAI();
+        }
     };
 
     // ─── Confirm Dialog ──────────────────────────────────────────────
@@ -815,12 +1063,15 @@
         currentSession.ticket = 'UNTITLED-INCIDENT';
         currentSession.callerName = '';
         currentSession.callbackNumber = '';
+        currentSession.elapsedMs = 0;
+        currentSession.timerStartedAt = null;
         currentSession.updatedAt = Date.now();
         ticketInput.value = '';
         callerNameInput.value = '';
         callbackNumInput.value = '';
         renderLogDisplay();
         renderSidebar();
+        syncTimerUI();
         await saveSession();
         mainInput.focus();
         showToast('SESSION CLEARED');
@@ -901,6 +1152,9 @@
     mainInput.addEventListener('input', () => {
         clearGhost();
         debouncedSuggest(mainInput.value);
+        if (timerMode === 'auto' && currentSession && !currentSession.timerStartedAt) {
+            startTimer();
+        }
     });
 
     // Ticket ID
@@ -1006,6 +1260,12 @@
 
     // ─── Init ──────────────────────────────────────────────────────
     async function init() {
+        const savedTheme = await db.getPref('theme');
+        if (savedTheme && THEMES[savedTheme]) applyTheme(savedTheme, false);
+
+        const savedTimerMode = await db.getPref('timerMode');
+        timerMode = savedTimerMode || 'auto';
+
         const modelId = await db.getPref('modelId');
 
         if (!modelId) {
