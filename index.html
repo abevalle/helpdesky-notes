@@ -251,6 +251,10 @@
                 <option value="cyberpunk">Cyberpunk — Neon magenta</option>
                 <option value="solarized">Solarized Dark — Classic</option>
                 <option value="light">Light — Easy on the eyes</option>
+                <option value="stealth">Stealth — Looks like Notepad</option>
+                <option value="stealth-dark">Stealth Dark — Dark mode Windows</option>
+                <option value="teams">Teams — Microsoft Teams vibes</option>
+                <option value="teams-dark">Teams Dark — Dark mode Teams</option>
             </select>
         </div>
 
@@ -260,10 +264,10 @@
             <select id="model-select">
                 <option value="SmolLM2-360M-Instruct-q4f16_1-MLC">SmolLM 360M — Fastest (~200MB)</option>
                 <option value="Qwen2.5-0.5B-Instruct-q4f16_1-MLC">Qwen 2.5 0.5B — Fast (~350MB)</option>
-                <option value="Llama-3.2-1B-Instruct-q4f16_1-MLC" selected>Llama 3.2 1B — Balanced (~700MB)</option>
+                <option value="Llama-3.2-1B-Instruct-q4f16_1-MLC">Llama 3.2 1B — Balanced (~700MB)</option>
                 <option value="Phi-3.5-mini-instruct-q4f16_1-MLC">Phi 3.5 Mini — Best Quality (~2.2GB)</option>
                 <option value="custom">Custom Model ID...</option>
-                <option value="none">Disable AI (notes only)</option>
+                <option value="none" selected>Disable AI (notes only)</option>
             </select>
         </div>
 
@@ -408,7 +412,8 @@
             '--text-secondary': '#ccc', '--text-muted': '#666', '--text-dim': '#444',
             '--placeholder': '#333', '--input-bg': '#000', '--danger': '#ff4444',
             '--ghost': '#2a5a30', '--focus-glow': 'rgba(0, 255, 65, 0.2)',
-            '--ai-bg': 'rgba(0, 255, 255, 0.03)'
+            '--ai-bg': 'rgba(0, 255, 255, 0.03)',
+            '--font': "'Fira Code', 'Courier New', monospace"
         },
         amber: {
             '--bg': '#0c0a00', '--sidebar-bg': '#141200', '--text': '#ffb000',
@@ -417,7 +422,8 @@
             '--text-secondary': '#cca050', '--text-muted': '#886830', '--text-dim': '#554020',
             '--placeholder': '#3a2800', '--input-bg': '#080600', '--danger': '#ff4444',
             '--ghost': '#5a4a20', '--focus-glow': 'rgba(255, 176, 0, 0.2)',
-            '--ai-bg': 'rgba(255, 216, 102, 0.03)'
+            '--ai-bg': 'rgba(255, 216, 102, 0.03)',
+            '--font': "'Fira Code', 'Courier New', monospace"
         },
         cyberpunk: {
             '--bg': '#0a0010', '--sidebar-bg': '#120018', '--text': '#ff2d95',
@@ -426,7 +432,8 @@
             '--text-secondary': '#c090dd', '--text-muted': '#7a50a0', '--text-dim': '#4a2868',
             '--placeholder': '#2a1040', '--input-bg': '#050008', '--danger': '#ff4444',
             '--ghost': '#5a2050', '--focus-glow': 'rgba(255, 45, 149, 0.2)',
-            '--ai-bg': 'rgba(185, 103, 255, 0.05)'
+            '--ai-bg': 'rgba(185, 103, 255, 0.05)',
+            '--font': "'Fira Code', 'Courier New', monospace"
         },
         solarized: {
             '--bg': '#002b36', '--sidebar-bg': '#073642', '--text': '#839496',
@@ -435,7 +442,8 @@
             '--text-secondary': '#93a1a1', '--text-muted': '#657b83', '--text-dim': '#586e75',
             '--placeholder': '#2a4a50', '--input-bg': '#001e26', '--danger': '#dc322f',
             '--ghost': '#2a5048', '--focus-glow': 'rgba(131, 148, 150, 0.2)',
-            '--ai-bg': 'rgba(42, 161, 152, 0.05)'
+            '--ai-bg': 'rgba(42, 161, 152, 0.05)',
+            '--font': "'Fira Code', 'Courier New', monospace"
         },
         light: {
             '--bg': '#f5f5f0', '--sidebar-bg': '#e8e8e0', '--text': '#2050a0',
@@ -444,7 +452,48 @@
             '--text-secondary': '#444440', '--text-muted': '#808078', '--text-dim': '#a0a098',
             '--placeholder': '#c0c0b8', '--input-bg': '#ffffff', '--danger': '#d02020',
             '--ghost': '#a0b0d0', '--focus-glow': 'rgba(32, 80, 160, 0.15)',
-            '--ai-bg': 'rgba(0, 112, 160, 0.05)'
+            '--ai-bg': 'rgba(0, 112, 160, 0.05)',
+            '--font': "'Fira Code', 'Courier New', monospace"
+        },
+        stealth: {
+            '--bg': '#f0f0f0', '--sidebar-bg': '#e8e8e8', '--text': '#1a1a1a',
+            '--amber': '#0078d4', '--cyan': '#005a9e', '--border': '#d1d1d1',
+            '--surface': '#ffffff', '--hover': '#dcdcdc', '--text-bright': '#000000',
+            '--text-secondary': '#333333', '--text-muted': '#767676', '--text-dim': '#a0a0a0',
+            '--placeholder': '#c8c8c8', '--input-bg': '#ffffff', '--danger': '#c42b1c',
+            '--ghost': '#cce4f7', '--focus-glow': 'rgba(0, 120, 212, 0.25)',
+            '--ai-bg': 'rgba(0, 120, 212, 0.04)',
+            '--font': "'Segoe UI', Tahoma, sans-serif"
+        },
+        teams: {
+            '--bg': '#f5f5f5', '--sidebar-bg': '#ebebeb', '--text': '#242424',
+            '--amber': '#5b5fc7', '--cyan': '#7f85f5', '--border': '#d1d1d1',
+            '--surface': '#ffffff', '--hover': '#e0e0e0', '--text-bright': '#000000',
+            '--text-secondary': '#424242', '--text-muted': '#707070', '--text-dim': '#adadad',
+            '--placeholder': '#c7c7c7', '--input-bg': '#ffffff', '--danger': '#c4314b',
+            '--ghost': '#e8e8fc', '--focus-glow': 'rgba(91, 95, 199, 0.25)',
+            '--ai-bg': 'rgba(91, 95, 199, 0.04)',
+            '--font': "'Segoe UI', Tahoma, sans-serif"
+        },
+        'stealth-dark': {
+            '--bg': '#1f1f1f', '--sidebar-bg': '#2d2d2d', '--text': '#cccccc',
+            '--amber': '#4cc2ff', '--cyan': '#0078d4', '--border': '#404040',
+            '--surface': '#383838', '--hover': '#333333', '--text-bright': '#ffffff',
+            '--text-secondary': '#b0b0b0', '--text-muted': '#808080', '--text-dim': '#555555',
+            '--placeholder': '#4a4a4a', '--input-bg': '#2a2a2a', '--danger': '#f85149',
+            '--ghost': '#253545', '--focus-glow': 'rgba(76, 194, 255, 0.2)',
+            '--ai-bg': 'rgba(76, 194, 255, 0.04)',
+            '--font': "'Segoe UI', Tahoma, sans-serif"
+        },
+        'teams-dark': {
+            '--bg': '#1b1a1f', '--sidebar-bg': '#292828', '--text': '#d6d6d6',
+            '--amber': '#7b83eb', '--cyan': '#5b5fc7', '--border': '#3d3d3d',
+            '--surface': '#333238', '--hover': '#3a393f', '--text-bright': '#ffffff',
+            '--text-secondary': '#adadad', '--text-muted': '#7a7a7a', '--text-dim': '#505050',
+            '--placeholder': '#454545', '--input-bg': '#252429', '--danger': '#f85149',
+            '--ghost': '#2e2d48', '--focus-glow': 'rgba(123, 131, 235, 0.2)',
+            '--ai-bg': 'rgba(123, 131, 235, 0.04)',
+            '--font': "'Segoe UI', Tahoma, sans-serif"
         }
     };
 
@@ -748,9 +797,7 @@
         if (!timerInterval) {
             timerInterval = setInterval(updateTimerDisplay, 1000);
         }
-        if (timerMode === 'manual') {
-            timerToggleBtn.textContent = 'PAUSE';
-        }
+        timerToggleBtn.textContent = 'PAUSE';
     }
 
     function pauseTimer() {
@@ -758,9 +805,7 @@
         currentSession.elapsedMs = (currentSession.elapsedMs || 0) + (Date.now() - currentSession.timerStartedAt);
         currentSession.timerStartedAt = null;
         debouncedSave();
-        if (timerMode === 'manual') {
-            timerToggleBtn.textContent = 'START';
-        }
+        timerToggleBtn.textContent = timerMode === 'auto' ? 'RESUME' : 'START';
     }
 
     function resetTimer() {
@@ -769,9 +814,7 @@
         currentSession.timerStartedAt = null;
         updateTimerDisplay();
         debouncedSave();
-        if (timerMode === 'manual') {
-            timerToggleBtn.textContent = 'START';
-        }
+        timerToggleBtn.textContent = timerMode === 'auto' ? 'RESUME' : 'START';
     }
 
     function updateTimerDisplay() {
@@ -791,10 +834,12 @@
         }
 
         timerDisplay.style.display = '';
-        timerToggleBtn.style.display = timerMode === 'manual' ? '' : 'none';
-        timerResetBtn.style.display = timerMode === 'manual' ? '' : 'none';
+        timerToggleBtn.style.display = '';
+        timerResetBtn.style.display = '';
 
-        if (timerMode === 'manual') {
+        if (timerMode === 'auto') {
+            timerToggleBtn.textContent = currentSession?.timerStartedAt ? 'PAUSE' : 'RESUME';
+        } else {
             timerToggleBtn.textContent = currentSession?.timerStartedAt ? 'PAUSE' : 'START';
         }
 
@@ -843,8 +888,10 @@
         const modelId = await db.getPref('modelId');
         if (!modelId || modelId === 'none') {
             statusText.textContent = 'AI: DISABLED — NOTES ONLY MODE';
+            document.getElementById('summary-btn').style.display = 'none';
             return;
         }
+        document.getElementById('summary-btn').style.display = '';
         if (!navigator.gpu) {
             statusText.textContent = 'AI: WEBGPU NOT AVAILABLE';
             return;
@@ -967,7 +1014,7 @@
             timerModeSelect.value = timerMode;
         } else {
             themeSelect.value = 'matrix';
-            modelSelect.value = 'Llama-3.2-1B-Instruct-q4f16_1-MLC';
+            modelSelect.value = 'none';
             customModelGroup.style.display = 'none';
             customModelInput.value = '';
             timerModeSelect.value = 'auto';
