@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helpdesky.net | Incident Logger</title>
+    <meta name="description" content="Fast note-taking for helpdesk reps. AI-powered summaries, instant logging, zero setup.">
+    <meta name="theme-color" content="#0a0a0b">
+    <meta property="og:title" content="Helpdesky.net — Fast Notes for Fast Support">
+    <meta property="og:description" content="AI-powered incident logger for helpdesk teams. Take notes at the speed of support.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2300ff41' rx='6'/%3E%3Ctext x='6' y='24' font-size='22' font-family='monospace' font-weight='bold' fill='%230a0a0b'%3EH%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://esm.run">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0b;
+            --sidebar-bg: #121214;
+            --text: #00ff41;
+            --amber: #ffb000;
+            --cyan: #00ffff;
+            --border: #2d2d30;
+            --font: 'Fira Code', 'Courier New', monospace;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { margin: 0; padding: 0; height: 100%; }
+        body {
+            margin: 0; padding: 0; height: 100%; width: 100%;
+            background: var(--bg); color: var(--text);
+            font-family: var(--font); display: flex; overflow: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #2d2d30; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #444; }
+
+        /* --- Sidebar --- */
+        #sidebar {
+            width: 280px; background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 20px; border-bottom: 1px solid var(--border);
+            color: var(--amber); font-weight: bold; letter-spacing: 1px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        #session-list { flex: 1; overflow-y: auto; list-style: none; padding: 0; margin: 0; }
+        .session-item {
+            padding: 15px; padding-right: 36px; border-bottom: 1px solid #1a1a1c; cursor: pointer;
+            transition: 0.2s; border-left: 3px solid transparent; position: relative;
+        }
+        .session-item:hover { background: #1e1e21; }
+        .session-item.active { background: #1e1e21; border-left: 3px solid var(--text); }
+        .session-title { display: block; font-size: 0.9rem; color: #eee; margin-bottom: 4px; }
+        .session-meta { font-size: 0.7rem; color: #666; }
+        .session-delete {
+            position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
+            background: transparent; border: 1px solid transparent;
+            color: #444; font-size: 1.1rem; padding: 2px 6px;
+            cursor: pointer; opacity: 0; transition: 0.2s; line-height: 1;
+        }
+        .session-item:hover .session-delete { opacity: 1; }
+        .session-delete:hover { color: #ff4444; border-color: #ff4444; }
+
+        /* --- Main --- */
+        main { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--bg); }
+
+        #log-display { flex: 1; overflow-y: auto; padding: 25px; }
+
+        #status-bar {
+            height: 30px; background: #000; font-size: 0.75rem;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; color: var(--amber); border-top: 1px solid var(--border);
+        }
+        #status-hints { color: #444; }
+
+        .toolbar {
+            padding: 12px 20px; background: #121214;
+            display: flex; gap: 12px; align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .log-fields { padding: 0 0 10px 0; border-bottom: 1px solid var(--border); margin-bottom: 15px; }
+        .log-field { display: flex; align-items: baseline; margin-bottom: 4px; line-height: 1.6; font-size: 0.95rem; }
+        .log-field-label { color: var(--amber); white-space: nowrap; margin-right: 8px; font-weight: bold; }
+        .log-field input {
+            background: transparent; border: none; color: var(--cyan);
+            font-family: var(--font); font-size: 0.95rem; outline: none;
+            flex: 1; padding: 0; line-height: 1.6;
+        }
+        .log-field input::placeholder { color: #333; }
+
+        .input-wrapper { padding: 20px; background: #0a0a0b; width: 100%; }
+        .input-ghost-container { position: relative; }
+
+        textarea {
+            width: 100%; height: 90px; background: #121214;
+            border: 1px solid var(--border); color: var(--text);
+            font-family: var(--font); padding: 15px; outline: none;
+            resize: none; transition: border-color 0.3s, box-shadow 0.3s; font-size: 1rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            position: relative; z-index: 1;
+            caret-color: var(--text);
+        }
+        textarea:focus { border-color: var(--text); box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); }
+
+        .ghost-overlay {
+            position: absolute; inset: 0;
+            padding: 15px; font-family: var(--font); font-size: 1rem;
+            line-height: normal; border: 1px solid transparent;
+            white-space: pre-wrap; word-wrap: break-word;
+            overflow: hidden; pointer-events: none; z-index: 2;
+        }
+        .ghost-mirror { visibility: hidden; }
+        .ghost-suggestion { color: #2a5a30; }
+
+        button {
+            background: #1a1a1c; border: 1px solid var(--border); color: #ccc;
+            padding: 6px 14px; cursor: pointer; font-family: var(--font);
+            font-size: 0.75rem; transition: 0.2s;
+        }
+        button:hover { border-color: var(--text); color: var(--text); }
+        .btn-primary { border-color: var(--amber); color: var(--amber); }
+
+        /* --- Logs --- */
+        .log-entry { margin-bottom: 12px; line-height: 1.6; font-size: 0.95rem; }
+        .ts { color: #555; margin-right: 12px; font-weight: bold; }
+        .ai-entry {
+            background: rgba(0, 255, 255, 0.03); border-left: 3px solid var(--cyan);
+            padding: 15px; margin: 15px 0; border-radius: 0 4px 4px 0;
+        }
+        .log-img { max-width: 100%; border: 1px solid var(--border); margin: 10px 0; border-radius: 4px; }
+
+        /* --- Modal --- */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: var(--sidebar-bg); border: 1px solid var(--border);
+            padding: 40px; max-width: 480px; width: 90%;
+            border-radius: 4px;
+        }
+        .modal-content h2 {
+            color: var(--amber); margin: 0 0 8px 0;
+            letter-spacing: 2px; font-size: 1.1rem;
+        }
+        .modal-subtitle {
+            color: #666; margin: 0 0 30px 0; font-size: 0.85rem;
+        }
+        .modal-section { margin-bottom: 20px; }
+        .modal-section label {
+            display: block; color: var(--text); font-size: 0.75rem;
+            margin-bottom: 8px; letter-spacing: 1px;
+        }
+        .modal-section select,
+        .modal-section input[type="text"] {
+            width: 100%; background: #000; border: 1px solid var(--border);
+            color: var(--cyan); padding: 10px 12px; font-family: var(--font);
+            font-size: 0.85rem; outline: none;
+        }
+        .modal-section select:focus,
+        .modal-section input[type="text"]:focus { border-color: var(--cyan); }
+        .modal-section select option { background: #000; color: var(--cyan); }
+        .modal-hint { display: block; color: #444; font-size: 0.7rem; margin-top: 6px; }
+        .modal-divider {
+            text-align: center; color: #444; font-size: 0.75rem;
+            margin: 20px 0; position: relative;
+        }
+        .modal-divider::before, .modal-divider::after {
+            content: ''; position: absolute; top: 50%; width: 35%;
+            height: 1px; background: var(--border);
+        }
+        .modal-divider::before { left: 0; }
+        .modal-divider::after { right: 0; }
+        #setup-start-btn {
+            width: 100%; padding: 12px; margin-top: 10px;
+            font-size: 0.9rem; letter-spacing: 1px;
+        }
+        .webgpu-warning {
+            color: #ff4444; font-size: 0.75rem;
+            margin-top: 12px; display: none;
+        }
+
+        /* --- Confirm Modal --- */
+        .confirm-body { color: #ccc; font-size: 0.85rem; margin: 15px 0 20px; line-height: 1.6; }
+        .confirm-actions { display: flex; gap: 10px; }
+        .confirm-actions button { flex: 1; padding: 10px; font-size: 0.8rem; }
+        .btn-danger { border-color: #ff4444; color: #ff4444; }
+        .btn-danger:hover { background: #ff4444; color: #000; border-color: #ff4444; }
+        .confirm-toggle {
+            display: flex; align-items: center; gap: 8px;
+            margin-top: 15px; font-size: 0.75rem; color: #666; cursor: pointer;
+        }
+        .confirm-toggle input { accent-color: var(--amber); cursor: pointer; }
+
+        /* --- Toast --- */
+        .toast {
+            position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%);
+            background: var(--amber); color: #000; padding: 8px 20px;
+            font-family: var(--font); font-size: 0.8rem; font-weight: bold;
+            border-radius: 4px; opacity: 0; transition: opacity 0.3s;
+            pointer-events: none; z-index: 200;
+        }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+
+<!-- Setup Modal -->
+<div id="setup-modal" class="modal-overlay" style="display:none">
+    <div class="modal-content">
+        <h2 id="setup-title">HELPDESKY.NET — SETUP</h2>
+        <p class="modal-subtitle">Fast notes for fast support. Choose your AI model.</p>
+
+        <div class="modal-section">
+            <label>SELECT AI MODEL (RECOMMENDED)</label>
+            <select id="model-select">
+                <option value="SmolLM2-360M-Instruct-q4f16_1-MLC">SmolLM 360M — Fastest (~200MB)</option>
+                <option value="Qwen2.5-0.5B-Instruct-q4f16_1-MLC">Qwen 2.5 0.5B — Fast (~350MB)</option>
+                <option value="Llama-3.2-1B-Instruct-q4f16_1-MLC" selected>Llama 3.2 1B — Balanced (~700MB)</option>
+                <option value="Phi-3.5-mini-instruct-q4f16_1-MLC">Phi 3.5 Mini — Best Quality (~2.2GB)</option>
+                <option value="custom">Custom Model ID...</option>
+                <option value="none">Disable AI (notes only)</option>
+            </select>
+        </div>
+
+        <div id="custom-model-group" class="modal-section" style="display:none">
+            <div class="modal-divider">CUSTOM</div>
+            <label>MODEL ID</label>
+            <input type="text" id="custom-model-id" placeholder="e.g. MyModel-q4f16_1-MLC">
+            <span class="modal-hint">For self-hosted models or compliance requirements. Use any web-llm compatible model ID.</span>
+        </div>
+
+        <div id="webgpu-warning" class="webgpu-warning">
+            WebGPU not detected. AI features require Chrome 113+, Edge 113+, or another WebGPU-capable browser.
+            You can still use Helpdesky for note-taking without AI.
+        </div>
+
+        <button id="setup-start-btn" class="btn-primary">GET STARTED</button>
+    </div>
+</div>
+
+<!-- Confirm Modal -->
+<div id="confirm-modal" class="modal-overlay" style="display:none">
+    <div class="modal-content">
+        <h2 id="confirm-title">CONFIRM</h2>
+        <div id="confirm-body" class="confirm-body"></div>
+        <label id="confirm-toggle-wrap" class="confirm-toggle">
+            <input type="checkbox" id="confirm-skip-toggle">
+            Don't ask me again
+        </label>
+        <div class="confirm-actions">
+            <button id="confirm-cancel">CANCEL</button>
+            <button id="confirm-ok" class="btn-danger">CLEAR</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<!-- Sidebar -->
+<aside id="sidebar">
+    <div class="sidebar-header">
+        <span>SESSIONS</span>
+        <button id="new-btn" class="btn-primary">+ NEW</button>
+    </div>
+    <ul id="session-list"></ul>
+    <div style="padding: 10px;">
+        <button id="export-btn" style="width: 100%;">EXPORT ALL (JSON)</button>
+    </div>
+</aside>
+
+<!-- Main -->
+<main>
+    <div class="toolbar">
+        <button id="clear-btn" class="btn-danger">CLEAR SESSION</button>
+        <button id="summary-btn">AI SUMMARY</button>
+        <button id="copy-text-btn">COPY RAW</button>
+        <button id="settings-btn">AI SETTINGS</button>
+    </div>
+
+    <div id="log-display">
+        <div class="log-fields">
+            <div class="log-field"><span class="log-field-label">TICKET://</span><input type="text" id="ticket-id" placeholder="untitled-incident"></div>
+            <div class="log-field"><span class="log-field-label">CALLER://</span><input type="text" id="caller-name" placeholder="name"></div>
+            <div class="log-field"><span class="log-field-label">CALLBK://</span><input type="tel" id="callback-number" placeholder="number"></div>
+        </div>
+    </div>
+
+    <div id="status-bar">
+        <span id="status-text">INITIALIZING...</span>
+        <span id="status-hints">Enter: send | Tab: accept suggestion | Alt+N: new</span>
+    </div>
+
+    <div class="input-wrapper">
+        <div class="input-ghost-container">
+            <div id="ghost-overlay" class="ghost-overlay"></div>
+            <textarea id="main-input" placeholder="Type log message... [Enter] to send, [Tab] to accept suggestion"></textarea>
+        </div>
+    </div>
+</main>
+
+<script type="module">
+    // ─── IndexedDB Storage Layer ───────────────────────────────────
+    const db = {
+        _db: null,
+        async open() {
+            if (this._db) return this._db;
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open('helpdesky', 1);
+                req.onupgradeneeded = (e) => {
+                    const d = e.target.result;
+                    if (!d.objectStoreNames.contains('sessions')) d.createObjectStore('sessions', { keyPath: 'id' });
+                    if (!d.objectStoreNames.contains('preferences')) d.createObjectStore('preferences', { keyPath: 'key' });
+                };
+                req.onsuccess = () => { this._db = req.result; resolve(this._db); };
+                req.onerror = () => reject(req.error);
+            });
+        },
+        async _store(name, mode) {
+            const d = await this.open();
+            return d.transaction(name, mode).objectStore(name);
+        },
+        async get(store, key) {
+            const s = await this._store(store, 'readonly');
+            return new Promise(r => { const q = s.get(key); q.onsuccess = () => r(q.result); q.onerror = () => r(null); });
+        },
+        async put(store, data) {
+            const s = await this._store(store, 'readwrite');
+            return new Promise((resolve, reject) => { const q = s.put(data); q.onsuccess = () => resolve(); q.onerror = () => reject(q.error); });
+        },
+        async delete(store, key) {
+            const s = await this._store(store, 'readwrite');
+            return new Promise(r => { const q = s.delete(key); q.onsuccess = () => r(); q.onerror = () => r(); });
+        },
+        async getAll(store) {
+            const s = await this._store(store, 'readonly');
+            return new Promise(r => { const q = s.getAll(); q.onsuccess = () => r(q.result || []); q.onerror = () => r([]); });
+        },
+        async getPref(key) { const r = await this.get('preferences', key); return r ? r.value : null; },
+        async setPref(key, value) { return this.put('preferences', { key, value }); }
+    };
+
+    // ─── Utilities ─────────────────────────────────────────────────
+    function debounce(fn, ms) {
+        let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+    }
+
+    function compressImage(dataUrl, maxWidth = 800, quality = 0.7) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let w = img.width, h = img.height;
+                if (w > maxWidth) { h = (maxWidth / w) * h; w = maxWidth; }
+                canvas.width = w;
+                canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.onerror = () => resolve(dataUrl);
+            img.src = dataUrl;
+        });
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    // ─── State ─────────────────────────────────────────────────────
+    let sessions = [];
+    let currentSession = null;
+    let engine = null;
+    let aiReady = false;
+    let saveTimeout = null;
+
+    // ─── DOM Refs ──────────────────────────────────────────────────
+    const logDisplay = document.getElementById('log-display');
+    const statusText = document.getElementById('status-text');
+    const mainInput = document.getElementById('main-input');
+    const ticketInput = document.getElementById('ticket-id');
+    const sessionList = document.getElementById('session-list');
+    const setupModal = document.getElementById('setup-modal');
+    const modelSelect = document.getElementById('model-select');
+    const customModelGroup = document.getElementById('custom-model-group');
+    const customModelInput = document.getElementById('custom-model-id');
+    const callerNameInput = document.getElementById('caller-name');
+    const callbackNumInput = document.getElementById('callback-number');
+    const ghostOverlay = document.getElementById('ghost-overlay');
+
+    // ─── Rendering (XSS-safe) ──────────────────────────────────────
+    function renderEntry(entry) {
+        const div = document.createElement('div');
+        div.className = entry.type === 'ai' ? 'log-entry ai-entry' : 'log-entry';
+
+        const ts = document.createElement('span');
+        ts.className = 'ts';
+        ts.textContent = `[${entry.ts}]`;
+        div.appendChild(ts);
+
+        if (entry.type === 'image') {
+            const img = document.createElement('img');
+            img.src = entry.content;
+            img.className = 'log-img';
+            img.alt = 'Pasted image';
+            img.loading = 'lazy';
+            div.appendChild(img);
+        } else {
+            const span = document.createElement('span');
+            const lines = entry.content.split('\n');
+            lines.forEach((line, i) => {
+                span.appendChild(document.createTextNode(line));
+                if (i < lines.length - 1) span.appendChild(document.createElement('br'));
+            });
+            div.appendChild(span);
+        }
+        return div;
+    }
+
+    function renderLogDisplay() {
+        const fields = logDisplay.querySelector('.log-fields');
+        logDisplay.textContent = '';
+        if (fields) logDisplay.appendChild(fields);
+        if (!currentSession) return;
+        const frag = document.createDocumentFragment();
+        currentSession.entries.forEach(e => frag.appendChild(renderEntry(e)));
+        logDisplay.appendChild(frag);
+        logDisplay.scrollTop = logDisplay.scrollHeight;
+    }
+
+    function renderSidebar() {
+        sessionList.textContent = '';
+        const sorted = [...sessions].sort((a, b) => b.updatedAt - a.updatedAt);
+        const frag = document.createDocumentFragment();
+
+        sorted.forEach(s => {
+            const li = document.createElement('li');
+            li.className = `session-item${s.id === currentSession?.id ? ' active' : ''}`;
+
+            const title = document.createElement('span');
+            title.className = 'session-title';
+            title.textContent = s.ticket || 'UNTITLED-INCIDENT';
+
+            const meta = document.createElement('span');
+            meta.className = 'session-meta';
+            const metaParts = [s.callerName, new Date(s.updatedAt).toLocaleString()].filter(Boolean);
+            meta.textContent = metaParts.join(' — ');
+
+            const del = document.createElement('button');
+            del.className = 'session-delete';
+            del.textContent = '\u00d7';
+            del.title = 'Delete session';
+            del.onclick = async (e) => {
+                e.stopPropagation();
+                if (!confirm('Delete this session?')) return;
+                await db.delete('sessions', s.id);
+                sessions = sessions.filter(x => x.id !== s.id);
+                if (currentSession?.id === s.id) {
+                    if (sessions.length) {
+                        await switchToSession(sessions[0].id);
+                    } else {
+                        await createNewSession();
+                    }
+                }
+                renderSidebar();
+            };
+
+            li.appendChild(title);
+            li.appendChild(meta);
+            li.appendChild(del);
+            li.onclick = () => switchToSession(s.id);
+            frag.appendChild(li);
+        });
+        sessionList.appendChild(frag);
+    }
+
+    // ─── Session Management ────────────────────────────────────────
+    async function saveSession() {
+        if (!currentSession) return;
+        await db.put('sessions', currentSession);
+    }
+
+    const debouncedSave = debounce(saveSession, 300);
+
+    async function flushSave() {
+        clearTimeout(saveTimeout);
+        await saveSession();
+    }
+
+    async function createNewSession() {
+        if (currentSession && currentSession.entries.length === 0) {
+            mainInput.focus();
+            return;
+        }
+        await flushSave();
+
+        const session = {
+            id: Date.now().toString(),
+            ticket: 'UNTITLED-INCIDENT',
+            callerName: '',
+            callbackNumber: '',
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            entries: []
+        };
+        sessions.unshift(session);
+        currentSession = session;
+        await db.put('sessions', session);
+
+        ticketInput.value = '';
+        callerNameInput.value = '';
+        callbackNumInput.value = '';
+        renderLogDisplay();
+        renderSidebar();
+        mainInput.focus();
+    }
+
+    async function switchToSession(id) {
+        if (currentSession?.id === id) return;
+        await flushSave();
+
+        const session = sessions.find(s => s.id === id);
+        if (!session) return;
+
+        currentSession = session;
+        ticketInput.value = session.ticket === 'UNTITLED-INCIDENT' ? '' : session.ticket;
+        callerNameInput.value = session.callerName || '';
+        callbackNumInput.value = session.callbackNumber || '';
+        renderLogDisplay();
+        renderSidebar();
+        mainInput.focus();
+    }
+
+    async function loadAllSessions() {
+        sessions = await db.getAll('sessions');
+        sessions.sort((a, b) => b.updatedAt - a.updatedAt);
+
+        if (sessions.length === 0) {
+            await createNewSession();
+        } else {
+            currentSession = sessions[0];
+            ticketInput.value = currentSession.ticket === 'UNTITLED-INCIDENT' ? '' : currentSession.ticket;
+            callerNameInput.value = currentSession.callerName || '';
+            callbackNumInput.value = currentSession.callbackNumber || '';
+            renderLogDisplay();
+        }
+        renderSidebar();
+    }
+
+    function addEntry(content, type = 'text') {
+        if (!currentSession) return;
+        const entry = {
+            ts: new Date().toLocaleTimeString('en-GB'),
+            content,
+            type
+        };
+        currentSession.entries.push(entry);
+        currentSession.updatedAt = Date.now();
+        logDisplay.appendChild(renderEntry(entry));
+        logDisplay.lastElementChild.scrollIntoView({ block: 'end' });
+        debouncedSave();
+    }
+
+    function getRawText() {
+        if (!currentSession) return '';
+        const header = [
+            `Ticket: ${currentSession.ticket}`,
+            currentSession.callerName ? `Caller: ${currentSession.callerName}` : '',
+            currentSession.callbackNumber ? `Callback: ${currentSession.callbackNumber}` : ''
+        ].filter(Boolean).join('\n');
+        const logs = currentSession.entries
+            .filter(e => e.type !== 'image')
+            .map(e => `[${e.ts}] ${e.type === 'ai' ? '[AI] ' : ''}${e.content}`)
+            .join('\n');
+        return header + '\n\n' + logs;
+    }
+
+    // ─── AI Management ─────────────────────────────────────────────
+    const MODEL_FALLBACK = [
+        'Phi-3.5-mini-instruct-q4f16_1-MLC',
+        'Llama-3.2-1B-Instruct-q4f16_1-MLC',
+        'Qwen2.5-0.5B-Instruct-q4f16_1-MLC',
+        'SmolLM2-360M-Instruct-q4f16_1-MLC'
+    ];
+    let webllm = null;
+
+    function isOOM(err) {
+        const msg = String(err?.message || err || '').toLowerCase();
+        return msg.includes('out of memory') || msg.includes('oom') ||
+               msg.includes('device was lost') || msg.includes('disposed') ||
+               msg.includes('gpu') && (msg.includes('memory') || msg.includes('lost'));
+    }
+
+    function getSmallerModel(currentId) {
+        const idx = MODEL_FALLBACK.indexOf(currentId);
+        if (idx >= 0 && idx < MODEL_FALLBACK.length - 1) return MODEL_FALLBACK[idx + 1];
+        if (idx === -1) return MODEL_FALLBACK[MODEL_FALLBACK.length - 1];
+        return null;
+    }
+
+    async function initAI() {
+        const modelId = await db.getPref('modelId');
+        if (!modelId || modelId === 'none') {
+            statusText.textContent = 'AI: DISABLED — NOTES ONLY MODE';
+            return;
+        }
+        if (!navigator.gpu) {
+            statusText.textContent = 'AI: WEBGPU NOT AVAILABLE';
+            return;
+        }
+
+        statusText.textContent = 'AI: LOADING MODULE...';
+
+        try {
+            if (!webllm) webllm = await import('https://esm.run/@mlc-ai/web-llm');
+            engine = new webllm.MLCEngine();
+            engine.setInitProgressCallback((r) => {
+                const pct = Math.round(r.progress * 100);
+                statusText.textContent = `AI LOADING: ${pct}% — ${r.text || 'downloading...'}`;
+            });
+            await engine.reload(modelId);
+            aiReady = true;
+            const shortName = modelId.split('-').slice(0, 2).join(' ');
+            statusText.textContent = `AI: ONLINE — ${shortName}`;
+        } catch (e) {
+            console.error('AI init failed:', e);
+            aiReady = false;
+            engine = null;
+
+            if (isOOM(e)) {
+                const smaller = getSmallerModel(modelId);
+                if (smaller) {
+                    const shortName = smaller.split('-').slice(0, 2).join(' ');
+                    statusText.textContent = `AI: OUT OF MEMORY — TRYING ${shortName}...`;
+                    await db.setPref('modelId', smaller);
+                    return initAI();
+                }
+                statusText.textContent = 'AI: OUT OF MEMORY — ALL MODELS TOO LARGE FOR THIS GPU';
+            } else {
+                statusText.textContent = `AI: FAILED — ${e.message || 'see console'}`;
+            }
+        }
+    }
+
+    async function handleOOMRecovery() {
+        aiReady = false;
+        engine = null;
+        const currentModel = await db.getPref('modelId');
+        const smaller = getSmallerModel(currentModel);
+        if (smaller) {
+            const shortName = smaller.split('-').slice(0, 2).join(' ');
+            statusText.textContent = `AI: OUT OF MEMORY — SWITCHING TO ${shortName}...`;
+            showToast(`GPU OOM — FALLING BACK TO ${shortName}`);
+            await db.setPref('modelId', smaller);
+            await initAI();
+            return aiReady;
+        }
+        statusText.textContent = 'AI: OUT OF MEMORY — ALL MODELS TOO LARGE FOR THIS GPU';
+        showToast('GPU OOM — NO SMALLER MODEL AVAILABLE');
+        return false;
+    }
+
+    async function requestSummary() {
+        if (!currentSession || currentSession.entries.length === 0) {
+            showToast('NO ENTRIES TO SUMMARIZE');
+            return;
+        }
+        if (!aiReady || !engine) {
+            statusText.textContent = 'AI: STILL LOADING — TRY AGAIN SHORTLY';
+            return;
+        }
+
+        const text = getRawText();
+        if (!text.trim()) {
+            showToast('NO TEXT ENTRIES TO SUMMARIZE');
+            return;
+        }
+
+        statusText.textContent = 'AI: GENERATING SUMMARY...';
+        try {
+            const reply = await engine.chat.completions.create({
+                messages: [
+                    { role: 'system', content: 'You are an IT support assistant. Summarize the following helpdesk session notes into concise bullet points. Include: issue description, troubleshooting steps taken, and resolution (if any). Be brief and factual. Use bullet points.' },
+                    { role: 'user', content: text }
+                ],
+                max_tokens: 300
+            });
+            const summary = reply.choices[0].message.content;
+            addEntry(summary, 'ai');
+            statusText.textContent = 'AI: SUMMARY COMPLETE';
+        } catch (e) {
+            console.error('Summary failed:', e);
+            if (isOOM(e)) {
+                await handleOOMRecovery();
+                return;
+            }
+            statusText.textContent = 'AI: ERROR — ' + (e.message || 'summary failed');
+        }
+    }
+
+    // ─── Setup Modal ───────────────────────────────────────────────
+    function showSetupModal(isSettings = false) {
+        const title = document.getElementById('setup-title');
+        const btn = document.getElementById('setup-start-btn');
+        title.textContent = isSettings ? 'AI MODEL SETTINGS' : 'HELPDESKY.NET — SETUP';
+        btn.textContent = isSettings ? 'SAVE & RELOAD AI' : 'GET STARTED';
+        setupModal.dataset.mode = isSettings ? 'settings' : 'setup';
+
+        if (!navigator.gpu) {
+            document.getElementById('webgpu-warning').style.display = 'block';
+        }
+
+        if (isSettings) {
+            db.getPref('modelId').then(id => {
+                if (!id) return;
+                const opt = modelSelect.querySelector(`option[value="${CSS.escape(id)}"]`);
+                if (opt) {
+                    modelSelect.value = id;
+                } else if (id !== 'none') {
+                    modelSelect.value = 'custom';
+                    customModelInput.value = id;
+                    customModelGroup.style.display = 'block';
+                }
+            });
+        } else {
+            modelSelect.value = 'Llama-3.2-1B-Instruct-q4f16_1-MLC';
+            customModelGroup.style.display = 'none';
+            customModelInput.value = '';
+        }
+
+        setupModal.style.display = 'flex';
+    }
+
+    modelSelect.onchange = () => {
+        customModelGroup.style.display = modelSelect.value === 'custom' ? 'block' : 'none';
+    };
+
+    document.getElementById('setup-start-btn').onclick = async () => {
+        let modelId = modelSelect.value;
+
+        if (modelId === 'custom') {
+            modelId = customModelInput.value.trim();
+            if (!modelId) {
+                customModelInput.focus();
+                return;
+            }
+        }
+
+        await db.setPref('modelId', modelId);
+        setupModal.style.display = 'none';
+
+        if (setupModal.dataset.mode === 'setup') {
+            await loadAllSessions();
+        }
+
+        aiReady = false;
+        engine = null;
+        initAI();
+    };
+
+    // ─── Confirm Dialog ──────────────────────────────────────────────
+    function confirmAction(title, body, okLabel = 'CONFIRM', prefKey = null) {
+        return new Promise(async (resolve) => {
+            if (prefKey) {
+                const skip = await db.getPref(prefKey);
+                if (skip) { resolve(true); return; }
+            }
+            const modal = document.getElementById('confirm-modal');
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-body').textContent = body;
+            document.getElementById('confirm-ok').textContent = okLabel;
+            const toggle = document.getElementById('confirm-skip-toggle');
+            const toggleWrap = document.getElementById('confirm-toggle-wrap');
+            toggleWrap.style.display = prefKey ? 'flex' : 'none';
+            toggle.checked = false;
+            modal.style.display = 'flex';
+
+            const cleanup = (result) => {
+                modal.style.display = 'none';
+                document.getElementById('confirm-cancel').onclick = null;
+                document.getElementById('confirm-ok').onclick = null;
+                resolve(result);
+            };
+            document.getElementById('confirm-cancel').onclick = () => cleanup(false);
+            document.getElementById('confirm-ok').onclick = async () => {
+                if (prefKey && toggle.checked) await db.setPref(prefKey, true);
+                cleanup(true);
+            };
+        });
+    }
+
+    async function clearCurrentSession() {
+        if (!currentSession) return;
+        const ok = await confirmAction(
+            'CLEAR SESSION',
+            'This will erase all log entries, caller info, and ticket ID for the current session. This cannot be undone.',
+            'CLEAR',
+            'skipClearConfirm'
+        );
+        if (!ok) return;
+
+        currentSession.entries = [];
+        currentSession.ticket = 'UNTITLED-INCIDENT';
+        currentSession.callerName = '';
+        currentSession.callbackNumber = '';
+        currentSession.updatedAt = Date.now();
+        ticketInput.value = '';
+        callerNameInput.value = '';
+        callbackNumInput.value = '';
+        renderLogDisplay();
+        renderSidebar();
+        await saveSession();
+        mainInput.focus();
+        showToast('SESSION CLEARED');
+    }
+
+    // ─── Ghost Text (Inline Suggestions) ───────────────────────────
+    let currentSuggestion = '';
+    let suggestionForText = '';
+    let suggestReqId = 0;
+
+    function showGhost(typed, suggestion) {
+        ghostOverlay.textContent = '';
+        const mirror = document.createElement('span');
+        mirror.className = 'ghost-mirror';
+        mirror.textContent = typed;
+        const ghost = document.createElement('span');
+        ghost.className = 'ghost-suggestion';
+        ghost.textContent = suggestion;
+        ghostOverlay.appendChild(mirror);
+        ghostOverlay.appendChild(ghost);
+        currentSuggestion = suggestion;
+        suggestionForText = typed;
+    }
+
+    function clearGhost() {
+        currentSuggestion = '';
+        suggestionForText = '';
+        ghostOverlay.textContent = '';
+    }
+
+    async function fetchSuggestion(text) {
+        if (!aiReady || !engine) return;
+        if (!text.trim() || text.trim().length < 3) { clearGhost(); return; }
+
+        const reqId = ++suggestReqId;
+        try {
+            const reply = await engine.chat.completions.create({
+                messages: [
+                    { role: 'system', content: 'Complete the following helpdesk note naturally in 3-8 words. Output ONLY the completion text. No quotes, no explanation.' },
+                    { role: 'user', content: text }
+                ],
+                max_tokens: 20
+            });
+            if (reqId !== suggestReqId) return;
+            if (mainInput.value !== text) return;
+            const suggestion = reply.choices[0].message.content;
+            if (suggestion && suggestion.trim()) showGhost(text, suggestion.trim());
+        } catch (e) {
+            if (isOOM(e)) handleOOMRecovery();
+        }
+    }
+
+    const debouncedSuggest = debounce((text) => fetchSuggestion(text), 600);
+
+    // ─── Event Handlers ────────────────────────────────────────────
+
+    // Text input
+    mainInput.addEventListener('keydown', async (e) => {
+        if (e.key === 'Tab' && currentSuggestion) {
+            e.preventDefault();
+            mainInput.value += currentSuggestion;
+            clearGhost();
+            return;
+        }
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            clearGhost();
+            suggestReqId++;
+            const text = mainInput.value.trim();
+            if (text) { addEntry(text); mainInput.value = ''; }
+        }
+        if (e.key === 'Escape' && currentSuggestion) {
+            clearGhost();
+            suggestReqId++;
+        }
+    });
+
+    mainInput.addEventListener('input', () => {
+        clearGhost();
+        debouncedSuggest(mainInput.value);
+    });
+
+    // Ticket ID
+    ticketInput.addEventListener('input', () => {
+        if (!currentSession) return;
+        currentSession.ticket = ticketInput.value || 'UNTITLED-INCIDENT';
+        currentSession.updatedAt = Date.now();
+        debouncedSave();
+        const activeTitle = sessionList.querySelector('.session-item.active .session-title');
+        if (activeTitle) activeTitle.textContent = currentSession.ticket;
+    });
+
+    // Caller name & callback number
+    callerNameInput.addEventListener('input', () => {
+        if (!currentSession) return;
+        currentSession.callerName = callerNameInput.value;
+        currentSession.updatedAt = Date.now();
+        debouncedSave();
+        const activeMeta = sessionList.querySelector('.session-item.active .session-meta');
+        if (activeMeta) {
+            const parts = [currentSession.callerName, new Date(currentSession.updatedAt).toLocaleString()].filter(Boolean);
+            activeMeta.textContent = parts.join(' — ');
+        }
+    });
+    callbackNumInput.addEventListener('input', () => {
+        if (!currentSession) return;
+        currentSession.callbackNumber = callbackNumInput.value;
+        currentSession.updatedAt = Date.now();
+        debouncedSave();
+    });
+
+    // Image paste with compression
+    mainInput.addEventListener('paste', (e) => {
+        const items = e.clipboardData.items;
+        for (const item of items) {
+            if (item.type.startsWith('image/')) {
+                e.preventDefault();
+                const blob = item.getAsFile();
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const compressed = await compressImage(event.target.result);
+                    addEntry(compressed, 'image');
+                };
+                reader.readAsDataURL(blob);
+                break;
+            }
+        }
+    });
+
+    // New session
+    document.getElementById('new-btn').onclick = () => createNewSession();
+
+    // Clear current session
+    document.getElementById('clear-btn').onclick = () => clearCurrentSession();
+
+    // Export
+    document.getElementById('export-btn').onclick = async () => {
+        await flushSave();
+        const allSessions = await db.getAll('sessions');
+        const blob = new Blob([JSON.stringify(allSessions, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `helpdesky_backup_${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast('EXPORTED');
+    };
+
+    // AI Summary
+    document.getElementById('summary-btn').onclick = () => requestSummary();
+
+    // Copy Raw
+    document.getElementById('copy-text-btn').onclick = async () => {
+        const text = getRawText();
+        if (!text) { showToast('NOTHING TO COPY'); return; }
+        try {
+            await navigator.clipboard.writeText(text);
+            showToast('COPIED TO CLIPBOARD');
+        } catch {
+            showToast('COPY FAILED — CHECK PERMISSIONS');
+        }
+    };
+
+    // AI Settings
+    document.getElementById('settings-btn').onclick = () => showSetupModal(true);
+
+    // Global keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.altKey && e.key === 'n') {
+            e.preventDefault();
+            createNewSession();
+        }
+        if (e.altKey && e.key === 'c') {
+            e.preventDefault();
+            document.getElementById('copy-text-btn').click();
+        }
+        if (e.altKey && e.key === 's') {
+            e.preventDefault();
+            requestSummary();
+        }
+    });
+
+    // ─── Init ──────────────────────────────────────────────────────
+    async function init() {
+        const modelId = await db.getPref('modelId');
+
+        if (!modelId) {
+            showSetupModal(false);
+        } else {
+            await loadAllSessions();
+            initAI();
+        }
+
+        mainInput.focus();
+    }
+
+    init();
+</script>
+</body>
+</html>
