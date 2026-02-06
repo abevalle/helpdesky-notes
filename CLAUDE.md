@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Helpdesky.net is a single-file (`index.html`) browser-based incident logging tool for helpdesk reps. It uses in-browser AI via web-llm (WebGPU) for smart compose and session summaries. Deployed as a static file to CDN (helpdesky.net).
+Helpdesky.net is a single-file (`index.html`) browser-based incident logging tool for helpdesk reps. The core purpose is CYA documentation — helping techs capture timestamped, structured notes during calls so they have evidence of what happened, what they tried, and what was resolved. It uses in-browser AI via web-llm (WebGPU) for smart compose (ghost text) and session summaries. Deployed as a static file to CDN (helpdesky.net). All data stays 100% local in the browser.
 
 ## Development
 
@@ -46,3 +46,14 @@ Everything lives in a single HTML file with three sections:
 - **Theming** — All colors must use CSS custom properties. When adding new UI, use existing variables (`--bg`, `--sidebar-bg`, `--text`, `--amber`, `--cyan`, `--border`, `--surface`, `--hover`, `--text-bright`, `--text-secondary`, `--text-muted`, `--text-dim`, `--placeholder`, `--input-bg`, `--danger`, `--ghost`, `--focus-glow`, `--ai-bg`). Never hardcode color values. New themes go in the `THEMES` JS object.
 - **Images** — Compressed to 800px max width, 0.7 JPEG quality before IndexedDB storage.
 - **Sidebar rebuilds** — Only on session create/delete/switch, not on every log entry (performance).
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Enter` | Send log entry |
+| `Tab` | Accept AI ghost text suggestion |
+| `Escape` | Dismiss suggestion |
+| `Alt+N` | New session |
+| `Alt+C` | Copy raw text |
+| `Alt+S` | AI summary |
