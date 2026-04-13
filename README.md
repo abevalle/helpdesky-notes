@@ -114,6 +114,12 @@ Change your model anytime via the AI Settings button in the toolbar.
 
 ---
 
+## Analytics
+
+This repo includes a Google Analytics tag (`G-PDHF20QMTB`) in `index.html` for the official helpdesky.net deployment. **If you are self-hosting or forking this project, remove the `<!-- Google tag (gtag.js) -->` script block from the `<head>` of `index.html`** so your users' traffic isn't reported to our analytics.
+
+---
+
 ## Contributing
 
 Helpdesky is a single-file app by design. PRs that keep it that way are welcome.

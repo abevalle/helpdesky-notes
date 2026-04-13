@@ -12,8 +12,7 @@ Helpdesky.net is a single-file (`index.html`) browser-based incident logging too
 # Serve locally for testing
 npx serve .
 
-# Deploy to Cloudflare Pages
-npx wrangler pages deploy . --project-name helpdesky
+# Deployed to Vercel (helpdesky.net)
 ```
 
 Test in a WebGPU-capable browser (Chrome 113+, Edge 113+). AI features require GPU; the app works without them.
@@ -38,6 +37,10 @@ Everything lives in a single HTML file with three sections:
    - **AI** — Dynamic import of web-llm from `esm.run`. OOM auto-fallback to smaller models. Ghost text suggestions (debounced 600ms) and one-click summaries.
    - **Setup/Settings modal** — First-launch setup or settings mode. Handles theme, model selection, timer mode. Preferences persisted in IndexedDB.
    - **Init** — Loads saved theme, timer mode, then either shows setup modal or loads sessions + AI.
+
+## Security
+
+This is a **public repository**. Never commit API keys, tokens, secrets, credentials, or any sensitive data. Do not hardcode internal URLs, passwords, or PII. Use environment variables or `.env` files (which must be in `.gitignore`) for any secrets needed during development or deployment. Review all changes for accidental data leaks before committing.
 
 ## Key Constraints
 
